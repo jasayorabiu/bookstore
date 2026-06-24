@@ -1,18 +1,39 @@
 import {prisma} from "../lib/prisma";
 import {Request, Response} from "express";
 import bcrypt from "bcrypt";
-import {getUsers as getAllUsers, getUserById as getSingleUser, createUser, updateUser, deleteUser, signInUser, signOutUser} from "../services/user.services";
+import  authservices from "../services/user.services";
+
+
 const getUsers = async (req: Request, res: Response) => {
     try {
-    const users = await getAllUsers();
+    const users = await authservices.getUsers();
     res.json({ message: "Users retrieved successfully", data: users });
 } catch (error) {
     res.status(500).json({ message: "Error retrieving users", error });
 }
 }
+const enableTwoFactorAuth = async (req: Request, res: Response) => {
+    try { 
+    const userId = Number(req.params.id);
+    const result = await authservices.enableTwoFactorAuth(userId);
+    res.json({ message: "Two-factor authentication enabled successfully", data: result });
+    }catch (error) { throw new Error("Error enabling two-factor authentication"); 
+    }
+}
+
+const verifyTwoFactorAuth = async (req: Request, res: Response) => {
+    const { code,  userId  } = req.body
+    const result = await authservices.verifyTwoFactorCode(userId, code);
+    if (result) {
+        res.json({ message: "Two-factor authentication verified successfully" });
+    } else {
+        res.status(400).json({ message: "Invalid two-factor authentication code" });
+    }
+}
+
 const getUserById = async (req: Request, res: Response) => {
     const id = req.params.id;
-    const user = await getSingleUser(Number(id));
+    const user = await authservices.getUserById(Number(id));
     if (user) {
         res.json({ message: "User retrieved successfully", data: user });
     } else {
@@ -23,7 +44,7 @@ const addUser = async (req: Request, res: Response) => {
 try { 
 
     const {name, email, password} = req.body;
-   const user = await createUser(name, email, password);
+   const user = await authservices.createUser(name, email, password);
    res.json({ message: "User created successfully", data: user });
 } catch (error) {
     res.status(500).json({ message: "Error creating user", error });
@@ -76,4 +97,4 @@ const deleteUsers = async (req: Request, res: Response) => {
     });
 }
 
-export {getUsers, getUserById, addUser, updateUsers, deleteUsers, logInUsers, logOutUsers}
+export {getUsers, getUserById, addUser, updateUsers, deleteUsers, logInUsers, logOutUsers, enableTwoFactorAuth, verifyTwoFactorAuth};

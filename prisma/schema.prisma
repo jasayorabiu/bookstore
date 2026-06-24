@@ -28,7 +28,11 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isTwoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
+  recoverCode String?
   orders    Order[]
+  sessions  session[]
 }
 
 model Order {
@@ -38,4 +42,20 @@ model Order {
   total     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive   Boolean  @default(true)
+}
+
+model blacklist {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
 }
