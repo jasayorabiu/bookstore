@@ -42,16 +42,10 @@ import {getOrder, getOrdersById, createOrders, updateOrders, deleteOrders } from
  *             schema:
  *               type: object
  *               properties:
- *                 page:
- *                   type: integer
- *                   example: 1
- *                 limit:
- *                   type: integer
- *                   example: 10
- *                 total:
- *                   type: integer
- *                   example: 1
- *                 items:
+ *                 message:
+ *                   type: string
+ *                   example: 'Orders retrieved successfully'
+ *                 data:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Order'
@@ -59,10 +53,8 @@ import {getOrder, getOrdersById, createOrders, updateOrders, deleteOrders } from
  *               sample:
  *                 summary: Sample orders list
  *                 value:
- *                   page: 1
- *                   limit: 10
- *                   total: 1
- *                   items:
+ *                   message: 'Orders retrieved successfully'
+ *                   data:
  *                     - id: 1
  *                       userId: 1
  *                       total: 49.99
@@ -92,12 +84,17 @@ router.get("/", getOrder);
  *             type: object
  *             required:
  *               - userId
+ *               - bookId
  *               - total
  *             properties:
  *               userId:
  *                 type: integer
  *                 example: 1
  *                 description: 'ID of the user placing the order (required)'
+ *               bookId:
+ *                 type: integer
+ *                 example: 1
+ *                 description: 'ID of the book being ordered (required)'
  *               total:
  *                 type: number
  *                 format: float
@@ -109,7 +106,13 @@ router.get("/", getOrder);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Order'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Order created successfully'
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
  *       400:
  *         description: Invalid input - Missing required fields or invalid data
  *       401:
@@ -142,7 +145,13 @@ router.post("/", createOrders);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Order'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Order retrieved successfully'
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
  *       400:
  *         description: Invalid order ID format
  *       401:
@@ -178,6 +187,14 @@ router.get("/:id", getOrdersById)
  *           schema:
  *             type: object
  *             properties:
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *                 description: 'Updated ID of the user placing the order'
+ *               bookId:
+ *                 type: integer
+ *                 example: 1
+ *                 description: 'Updated ID of the book for the order'
  *               total:
  *                 type: number
  *                 format: float
@@ -189,7 +206,13 @@ router.get("/:id", getOrdersById)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Order'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Order updated successfully'
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
  *       400:
  *         description: Invalid input data
  *       401:
@@ -219,8 +242,16 @@ router.put("/update/:id", updateOrders)
  *           type: integer
  *           example: 1
  *     responses:
- *       204:
+ *       200:
  *         description: Order deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Order deleted successfully'
  *       400:
  *         description: Invalid order ID format
  *       401:

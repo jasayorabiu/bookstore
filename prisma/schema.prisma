@@ -50,6 +50,7 @@ model session {
   user      User     @relation(fields: [userId], references: [id])
   token     String   @unique
   createdAt DateTime @default(now())
+  refreshToken String  @unique
   updatedAt DateTime @updatedAt
   isActive   Boolean  @default(true)
 }
@@ -57,5 +58,6 @@ model session {
 model blacklist {
   id        Int      @id @default(autoincrement())
   token     String   @unique
+  refreshToken String  @unique
   createdAt DateTime @default(now())
 }

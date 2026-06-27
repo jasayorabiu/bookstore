@@ -41,27 +41,19 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 page:
- *                   type: integer
- *                   example: 1
- *                 limit:
- *                   type: integer
- *                   example: 10
- *                 total:
- *                   type: integer
- *                   example: 100
- *                 items:
+ *                 message:
+ *                   type: string
+ *                   example: 'Books retrieved successfully'
+ *                 data:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Book'
  *             examples:
  *               sample:
- *                 summary: Sample paginated response
+ *                 summary: Sample books list
  *                 value:
- *                   page: 1
- *                   limit: 10
- *                   total: 1
- *                   items:
+ *                   message: 'Books retrieved successfully'
+ *                   data:
  *                     - id: 1
  *                       title: 'The Great Gatsby'
  *                       author: 'F. Scott Fitzgerald'
@@ -119,7 +111,13 @@ router.get("/", getBook);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Book'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Book created successfully'
+ *                 data:
+ *                   $ref: '#/components/schemas/Book'
  *       400:
  *         description: Invalid input - Missing required fields or invalid data type
  *       401:
@@ -152,7 +150,13 @@ router.post("/create", createBooks);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Book'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Book retrieved successfully'
+ *                 data:
+ *                   $ref: '#/components/schemas/Book'
  *       400:
  *         description: Invalid book ID format
  *       401:
@@ -207,7 +211,13 @@ router.get("/:id", getBooksById );
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Book'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Book updated successfully'
+ *                 data:
+ *                   $ref: '#/components/schemas/Book'
  *       400:
  *         description: Invalid input data
  *       401:
@@ -237,8 +247,16 @@ router.put("/:id", updateBooks);
  *           type: integer
  *           example: 1
  *     responses:
- *       204:
+ *       200:
  *         description: Book deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Book deleted successfully'
  *       400:
  *         description: Invalid book ID format
  *       401:

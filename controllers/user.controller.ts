@@ -22,13 +22,34 @@ const enableTwoFactorAuth = async (req: Request, res: Response) => {
 }
 
 const verifyTwoFactorAuth = async (req: Request, res: Response) => {
-    const { code,  userId  } = req.body
-    const result = await authservices.verifyTwoFactorCode(userId, code);
+    const { code,  userId  } = req.query
+    const result = await authservices.verifyTwoFactorCode(Number(userId), String(code));
     if (result) {
-        res.json({ message: "Two-factor authentication verified successfully" });
+        res.json({ message: "Two-factor authentication verified successfully", data: result });
     } else {
         res.status(400).json({ message: "Invalid two-factor authentication code" });
     }
+}
+
+const forgottenPassword = async (req:Request, res: Response) => {
+    try {
+        const {email} = req.body;
+        const result = await authservices.forgottenPassword(email);
+        res.status(200).json({resetToken: result})
+    } catch (error) {
+        res.status(400).json({error: "faill to reset to forgot password"})
+    }
+}
+
+const resetPassword = async (req: Request, res : Response) => {
+    try {
+          const {token, newPassword} = req.body;
+    const result = await authservices.resetPassword(token, newPassword);
+    res.status(200).json({success : result})
+    } catch (error){
+        res.status(400).json({error:"faill to reset password"})
+    }
+  
 }
 
 const getUserById = async (req: Request, res: Response) => {
@@ -53,18 +74,17 @@ try {
 
 const logInUsers = async (req: Request, res: Response) => {
     try {
-            const {email, password} = req.body;
-    const user = await prisma.user.findUnique({
-        where: {
-            email: email
+        const {email, password} = req.body;
+        const result = await authservices.signInUser(email, password);
+        if (result?.twoFactorRequired) {
+            res.status(200).json({ message: "Two-factor authentication required", twoFactorRequired: true, user: result.user });
+        } else {
+            res.json({ message: "User signed in successfully", data: result });
         }
-    });
-    if (user && await bcrypt.compare(password, user.password)) {
-        return user;
-    }
-    return null;
+   
 } catch (error) {
-    res.status(500).json({ message: "Error signing in user", error });
+    res.status(500).json({ message: "Error signing in user", error
+     });
 }
     }
 
@@ -82,9 +102,9 @@ const updateUsers = async (req: Request, res: Response) => {
             id: Number(id)
         },
         data: {
-            name,
-            email,
-            password
+            name : String(name),
+            email : String(email),
+            password : String(password),
         }
     });
 }
@@ -97,4 +117,4 @@ const deleteUsers = async (req: Request, res: Response) => {
     });
 }
 
-export {getUsers, getUserById, addUser, updateUsers, deleteUsers, logInUsers, logOutUsers, enableTwoFactorAuth, verifyTwoFactorAuth};
+export {getUsers, getUserById, addUser, updateUsers, deleteUsers, logInUsers, logOutUsers, enableTwoFactorAuth, verifyTwoFactorAuth,forgottenPassword,resetPassword};
